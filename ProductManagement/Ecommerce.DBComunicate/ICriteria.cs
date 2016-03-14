@@ -4,7 +4,7 @@ namespace Ecommerce.DBComunicate
 {
     public interface ICriteria
     {
-        string SPName { get; set; }
+        string GetSPName();
 
         IDictionary<string, object> GetParams();
 
