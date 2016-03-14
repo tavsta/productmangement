@@ -5,36 +5,41 @@
     using System.Configuration;
     using System.Data;
     using System.Data.SqlClient;
+    using System.IO;
     using System.Xml;
-    using System.Xml.Linq;
 
     public class DBObject
     {
-        private IDictionary<string, DBFunction> _funcs = new Dictionary<string, DBFunction>();
+        private static IDictionary<string, DBFunction> _funcs;
 
         public DBObject()
         {
-            var spFilePath = ConfigurationManager.AppSettings["SPFilePath"];
-            ParseSPFile(spFilePath);
+            if (_funcs == null)
+            {
+                _funcs = new Dictionary<string, DBFunction>();
+                var spFilePath = ConfigurationManager.AppSettings["SPFilePath"];
+                ParseSPFile(spFilePath);
+            }
         }
 
         private void ParseSPFile(string spFilePath)
         {
-            var xml = XDocument.Load(spFilePath);
+            var fullSPFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, spFilePath);
             XmlDocument xDoc = new XmlDocument();
-            xDoc.Load(spFilePath);
+            xDoc.Load(fullSPFilePath);
 
             foreach (XmlNode groupNode in xDoc.DocumentElement.ChildNodes)
             {
                 var groupName = groupNode.Attributes["Name"].Value;
-                var dbConnectionString = groupNode.Attributes["DBName"].Value;
-                var group = new DBGroup() { Name = groupName, Connection = new SqlConnection(dbConnectionString) };
+                var dbName = groupNode.Attributes["DBName"].Value;
 
+                var dbConnectionString = ConfigurationManager.ConnectionStrings[dbName].ConnectionString;
+                var group = new DBGroup() { Name = groupName, Connection = new SqlConnection(dbConnectionString) };
                 foreach (XmlNode funcNode in groupNode.ChildNodes)
                 {
                     var functionName = funcNode.Attributes["Name"].Value;
-                    var functionDBName = string.IsNullOrEmpty(funcNode.Attributes["DBName"].Value) ? funcNode.Attributes["DBName"].Value : null;
-                    _funcs.Add(functionName, new DBFunction() { Name = functionName, Group = group });
+                    var functionDBName = funcNode.Attributes["DBName"] != null ? funcNode.Attributes["DBName"].Value : null;
+                    _funcs.Add(functionName, new DBFunction() { Name = functionName, Group = group, DBName = functionDBName });
                 }
             }
         }
@@ -47,7 +52,7 @@
         public IEnumerable<T> Query<T>(ICriteria criteria)
         {
             var connection = GetConnectionOfFunc(criteria.GetSPName());
-            var dataList = new List<T>();
+            var objectList = new List<T>();
 
             using (SqlCommand cmd = new SqlCommand(criteria.GetSPName(), connection))
             {
@@ -61,12 +66,22 @@
 
                 while (data.Read())
                 {
-                    //Todo
+                    var newObject = Activator.CreateInstance<T>();
+                    var type = newObject.GetType();
+                    foreach (var property in type.GetProperties())
+                    {
+                        if (data[property.Name] != DBNull.Value)
+                        {
+                            property.SetValue(newObject, data[property.Name]);
+                        }
+                    }
+
+                    objectList.Add(newObject);
                 }
 
                 connection.Close();
             }
-            return dataList;
+            return objectList;
         }
 
         private void MapValueToDBValue(SqlParameterCollection parameters, ICriteria criteria)

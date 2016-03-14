@@ -6,7 +6,9 @@
     public interface IMenuService
     {
         IEnumerable<MenuModel> GetMenu();
+
         MenuModel Get(int id);
+
         IEnumerable<MenuModel> GetSubMenu(int id);
     }
 }

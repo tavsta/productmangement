@@ -1,10 +1,10 @@
 ﻿namespace Ecommerce.HumanApi.Controllers
 {
+    using System.Web.Http;
     using Ecommerce.HumanApi.Models;
-    using Microsoft.AspNet.Mvc;
 
     [Route("api/[controller]")]
-    public class LoginController : Controller
+    public class LoginController : ApiController
     {
         // GET: api/values
         [HttpPost]

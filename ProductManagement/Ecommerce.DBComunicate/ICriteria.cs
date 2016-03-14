@@ -6,8 +6,6 @@ namespace Ecommerce.DBComunicate
     {
         string GetSPName();
 
-        IDictionary<string, object> GetParams();
-
         bool Validate();
     }
 }

@@ -1,20 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Ecommerce.DBComunicate
+﻿namespace Ecommerce.DBComunicate
 {
-    public class Criteria : ICriteria
+    public class Criteria
     {
-        public IDictionary<string, object> GetParams()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetSPName()
-        {
-            return string.Empty;
-        }
-
         public virtual bool Validate()
         {
             return true;

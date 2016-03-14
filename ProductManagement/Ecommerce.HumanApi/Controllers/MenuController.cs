@@ -1,11 +1,11 @@
 ﻿namespace Ecommerce.HumanApi.Controllers
 {
     using System.Collections.Generic;
-    using Microsoft.AspNet.Mvc;
+    using System.Web.Http;
     using Models;
     using Services;
 
-    public class MenuController : Controller
+    public class MenuController : ApiController
     {
         private IMenuService _menuService { get; set; }
 

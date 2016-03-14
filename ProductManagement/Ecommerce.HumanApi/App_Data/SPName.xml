@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SP>
+	<Group Name="Human" DBName="ProductConnection">
+		<Function Name="User_GetAllUsers" />		
+	</Group>
+</SP>

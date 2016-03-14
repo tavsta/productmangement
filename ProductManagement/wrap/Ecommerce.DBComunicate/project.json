@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "dnx451": {
+      "bin": {
+        "assembly": "../../Ecommerce.DBComunicate/bin/Debug/Ecommerce.DBComunicate.dll",
+        "pdb": "../../Ecommerce.DBComunicate/bin/Debug/Ecommerce.DBComunicate.pdb"
+      }
+    }
+  }
+}
